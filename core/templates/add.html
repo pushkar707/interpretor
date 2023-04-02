@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+</head>
+<style>
+    form{
+        position: relative;
+    }
+    #editor { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    .editor{
+        height: 400px;
+        /* width: 60vw; */
+        margin: auto;
+        position: relative;
+    }
+    #code-input{
+        white-space: pre-wrap;
+    }
+</style>
+<body>
+    <form action="/add/" class="w-50 m-5 mx-auto" method="POST" onsubmit="setCodeInput(event,this)">
+        {%csrf_token%}
+        <div class="mb-3">
+            <label for="name" class="form-label">Function Name</label>
+            <input type="text" id="name" class="form-control" name="name" placeholder="Enter Function Name" required>
+        </div>
+        <div class="mb-3">
+            <label for="params-count">Choose Number of parameters: </label>
+            <input type="number" name="params-count" id="params-count" class="form-control" oninput="addParamFields(this.value)" required>
+        </div>
+        <div id="func-params">
+
+        </div>
+        <label for="editor" class="form-label">Function Inside Code</label>
+        <div class="editor mb-3">
+            <div id="editor"></div>
+        </div>
+            <input type="hidden" id="code-input" class="form-control" rows="10" name="code" placeholder="Enter Function Code" required>
+        <div class="mb-3">
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </div>
+    </form>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    const addParamFields = (value) => {
+        const param_container = document.getElementById('func-params')
+        param_container.innerHTML = ""
+        for (let index = 0; index < value; index++) {
+            const div = document.createElement('div')
+            div.classList.add('mb-3','d-flex')
+            const input = `
+            <div class="w-50 me-3">
+                <label for='param-${index+1}' class="form-label">Param-${index+1}</label>
+                <input type="text" id='param-${index+1}' class="form-control" name="param-${index+1}" placeholder="Param-${index+1}" required>    
+            </div>
+            <div class="w-50 ms-3">
+                <label for="name" class="form-label">Choose Data Type</label>
+                <select class="form-control" name="param-type-${index+1}" placeholder="Data Type" required>
+                    <option value="str">String</option>
+                    <option value="int">Int</option>
+                    <option value="float">Float</option>
+                    <option value="list">List</option>
+                    <option value="tuple">Tuple</option>
+                    <option value="dict">Dictionary</option>
+                    <option value="set">Set</option>
+                </select>
+            </div>
+            `
+            div.innerHTML = input
+            param_container.append(div)                   
+        }
+    }
+    // FOR TEXT EDITOR
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.setFontSize("18px")
+    editor.session.setMode("ace/mode/python");
+
+    const setCodeInput = (e,t) => {
+        e.preventDefault()
+        document.getElementById('code-input').value = editor.getValue()
+        t.submit()
+    }
+</script>
+</body>
+</html>
