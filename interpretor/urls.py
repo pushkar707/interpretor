@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import all,add,home,exec_func,test,delete,edit
+from core.views import all,add,home,exec_func,delete,edit
 
 urlpatterns = [
     path('',home),
@@ -24,6 +24,5 @@ urlpatterns = [
     path('function/<id>/',exec_func),
     path('function/delete/<id>/',delete),
     path('function/edit/<id>/',edit),
-    path('test/',test),
     path('admin/', admin.site.urls),
 ]

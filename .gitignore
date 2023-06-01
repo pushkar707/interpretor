@@ -1,2 +1,6 @@
-__pycache__
+*.py[cod]
+/ENV/
+/.idea/
+__pycache__/
+*.sql*
 migrations

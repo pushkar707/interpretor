@@ -47,25 +47,37 @@ def exec_func(request,id):
         return render(request,"get_params.html",{'params':params,'id':id,'code':function.code})
     if request.method=="POST":
         function = Function.objects.get(id=id)
-        params = ast.literal_eval(function.params)
-        f_code = function.code
-        if (f_code.find('print')==-1 and f_code.find('return') != -1):
-            f_code = f_code.replace('return','print(')+')'
-            
+        # Adding params to the code
+        params = ast.literal_eval(function.params)            
         code = ""
         for i in params.keys():
             if params[i] != 'str':
                 code += f"{i}={ast.literal_eval(request.POST.get(i))}\n"
             else:
                 code += f"{i}='{request.POST.get(i)}'\n"
-                
-        
-        code+=f_code
+
+        # writing output of function to file
+        f = open('output.txt','w')
+        f_code = function.code
+        code_lines = f_code.splitlines()
+        for i in code_lines[-1:-100:-1]:
+            if i == "":
+                continue
+            else:
+                if "return" in code_lines[-1]:
+                    code_lines[-1]=code_lines[-1].replace('return',"f.write(str(")+"))"
+                break
+        for i in code_lines:
+            if "print" in i:
+                i = i.replace('print(',"f.write(str(")+')'
+            code+=i+"\n"
+
         print(code)
         exec_obj = compile(code,'mulstring','exec')
         exec(exec_obj)
-        return render(request,'output.html',{'code':code})
+        f.close()
 
-def test(request):
-    f = Function.objects.get(id=3)
-    f.delete()
+        f = open('output.txt','r')
+        output = f.read()
+        f.close()
+        return render(request,'output.html',{'output':output})
